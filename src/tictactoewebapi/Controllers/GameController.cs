@@ -74,9 +74,9 @@ namespace tictactoewebapi.Controllers
             TableQuery<DynamicTableEntity> projectionQuery = new TableQuery<DynamicTableEntity>().Select(new string[] { gameKey });
 
             // Define an entity resolver to work with the entity after retrieval.
-            EntityResolver<string> resolver = (pk, rk, ts, props, etag) => props.ContainsKey("Email") ? props["Email"].StringValue : null;
+            EntityResolver<string> resolver = (pk, rk, ts, props, etag) => rk == gameKey? rk : null;
 
-            foreach (string projectedEmail in table.ExecuteQuery(projectionQuery, resolver, null, null))
+            foreach (string projectedEmail in cloudTable.(projectionQuery, resolver, null, null))
             {
                 Console.WriteLine(projectedEmail);
             }
