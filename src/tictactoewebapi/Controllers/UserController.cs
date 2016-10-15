@@ -5,23 +5,24 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.WindowsAzure.Storage; // Namespace for CloudStorageAccount
 using Microsoft.WindowsAzure.Storage.Table; // Namespace for Table storage types
+using Microsoft.WindowsAzure.Storage.Table.Protocol;
 using Microsoft.Extensions.Configuration;
 using tictactoewebapi.Model;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Cors;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace tictactoewebapi.Controllers
 {
     [Route("api/[controller]")]
-    public class GameController : Controller
+    public class UserController : BaseController
     {
-        public GameController(IOptions<ConfigurationOptions> configuration)
+        public UserController(IOptions<ConfigurationOptions> configuration)
+            : base(configuration)
         {
-            this.Configuration = configuration.Value;
         }
-        public ConfigurationOptions Configuration { get; set; }
-        // GET: api/game
+        // GET: api/User
         /// <summary>
         /// gets nothing
         /// </summary>
@@ -32,21 +33,21 @@ namespace tictactoewebapi.Controllers
             return new string[] { };
         }
 
-        // GET api/game/jared
+        // GET api/User/jared
         /// <summary>
-        /// gets a list of Games that a person has played
+        /// gets a list of Users that a person has played
         /// </summary>
-        /// <param name="userName">the user to get the games of</param>
+        /// <param name="userName">the user to get the Users of</param>
         /// <returns></returns>
         [HttpGet("{userName}")]
-        public async Task<IEnumerable<GameContext>> GetAll(string userName)
+        public async Task<IEnumerable<User>> GetAll(string userName)
         {
             //// Retrieve the storage account from the connection string.
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(Configuration.AzureConnection);
             // Create the table client.
             CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
             // Retrieve a reference to the table.
-            CloudTable cloudTable = tableClient.GetTableReference("gamecontext");
+            CloudTable cloudTable = tableClient.GetTableReference("User");
             // Create the table if it doesn't exist.
             var result = await cloudTable.CreateIfNotExistsAsync();
 
@@ -54,27 +55,27 @@ namespace tictactoewebapi.Controllers
         }
         
         /// <summary>
-        /// gets a game context by the rowkey
+        /// gets a User context by the rowkey
         /// </summary>
-        /// <param name="gameKey"></param>
+        /// <param name="UserKey"></param>
         /// <returns></returns>
-        [HttpGet("{gameKey}")]
-        public async Task<GameContext> Get(string gameKey)
+        [HttpGet("{UserKey}")]
+        public async Task<User> Get(string UserKey)
         {
             //// Retrieve the storage account from the connection string.
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(Configuration.AzureConnection);
             // Create the table client.
             CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
             // Retrieve a reference to the table.
-            CloudTable cloudTable = tableClient.GetTableReference("gamecontext");
+            CloudTable cloudTable = tableClient.GetTableReference("User");
             // Create the table if it doesn't exist.
             var result = await cloudTable.CreateIfNotExistsAsync();
 
             // Define the query, and select only the Email property.
-            TableQuery<DynamicTableEntity> projectionQuery = new TableQuery<DynamicTableEntity>().Select(new string[] { gameKey });
+            TableQuery<DynamicTableEntity> projectionQuery = new TableQuery<DynamicTableEntity>().Select(new string[] { UserKey });
 
             // Define an entity resolver to work with the entity after retrieval.
-            EntityResolver<string> resolver = (pk, rk, ts, props, etag) => rk == gameKey? rk : null;
+            EntityResolver<string> resolver = (pk, rk, ts, props, etag) => rk == UserKey? rk : null;
 
             //foreach (string projectedEmail in cloudTable.(projectionQuery, resolver, null, null))
             //{
@@ -84,53 +85,49 @@ namespace tictactoewebapi.Controllers
             return null;
         }
 
-        // GET api/game/new
         /// <summary>
-        /// gets a new instance of a game
+        /// gets a User context by the rowkey
         /// </summary>
-        /// <param name="userName">the user to create the game for</param>
+        /// <param name="UserKey"></param>
         /// <returns></returns>
-        [HttpGet]
-        public GameContext New(string userName)
+        [HttpGet("{email}")]
+        public async Task<User> ByEmail(string email)
         {
-            return new GameContext()
-            {
-                me = userName,
-                initiator = userName
-            };
+            CloudTable cloudTable = await base.GetTableAsync("User");            
+            TableOperation retrieveOperation = TableOperation.Retrieve<User>("game-tictactoe", email);
+            var retrieveResult = await cloudTable.ExecuteAsync(retrieveOperation);
+            return (User)retrieveResult.Result;
         }
-
+        
         // POST api/values
         [HttpPost]
-        public async Task<GameContext> Post(GameContext value)
+        public async Task<User> Post([FromBody] User value)
         {
-            //// Retrieve the storage account from the connection string.
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(Configuration.AzureConnection);
-            // Create the table client.
-            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
-            // Retrieve a reference to the table.
-            CloudTable cloudTable = tableClient.GetTableReference("gamecontext");
-            // Create the table if it doesn't exist.
-            var result = await cloudTable.CreateIfNotExistsAsync();
+            var cloudTable = await base.GetTableAsync("User");
 
-
-            if(string.IsNullOrEmpty(value.RowKey))
+            var existing = await ByEmail(value.email);
+            if (null == existing)
             {
-                value.CreateId();
+                value.PartitionKey = "game-user";
+                value.RowKey = value.email;
+                value.created = DateTime.Now;
                 TableOperation insertOperation = TableOperation.Insert(value);
+            }
+            else
+            {
+               value = existing.UpdateWith(value);
             }
             // Create the InsertOrReplace TableOperation.
             TableOperation insertOrReplaceOperation = TableOperation.InsertOrReplace(value);
             // Execute the operation.
             var insertOrReplaceResult = await cloudTable.ExecuteAsync(insertOrReplaceOperation);
-
-            return value;
+            return (User)insertOrReplaceResult.Result;
         }
 
 
         // DELETE api/values/userName
-        [HttpDelete("{userName}/{gameKey}")]
-        public void Delete(string userName, string gameKey)
+        [HttpDelete("{userName}/{UserKey}")]
+        public void Delete(string userName, string UserKey)
         {
         }
     }

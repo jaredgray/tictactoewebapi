@@ -9,8 +9,6 @@ namespace tictactoewebapi.Model
 {
     public class ModelEntity : TableEntity
     {
-        public ModelEntity(string partitionKey) : base(partitionKey, string.Empty) { }
-        public ModelEntity() { }
 
         public void CreateId()
         {

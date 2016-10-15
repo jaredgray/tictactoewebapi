@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using tictactoewebapi.Model;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 
 namespace tictactoewebapi
 {
@@ -30,6 +31,18 @@ namespace tictactoewebapi
         {
             // Add framework services.
             //services.AddRouting();
+            services.AddCors();
+            //Add Cors support to the service
+            services.AddCors();
+            
+
+            var policy = new CorsPolicy();
+            policy.Headers.Add("*");
+            policy.Methods.Add("*");
+            policy.Origins.Add("*");
+            policy.SupportsCredentials = true;
+            services.AddCors(configure => configure.AddPolicy("AllowAllClients", policy));
+
             services.AddOptions();
             services.Configure<ConfigurationOptions>(Configuration);
             services.Configure<ConfigurationOptions>(Configuration.GetSection("ConfigurationOptions"));
@@ -42,8 +55,9 @@ namespace tictactoewebapi
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-            
+            app.UseCors("AllowAllClients");
             app.UseMvc();
+           
         }
     }
 }

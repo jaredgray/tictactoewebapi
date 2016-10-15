@@ -10,7 +10,9 @@
         "**/.svn": true,
         "**/.hg": true,
         "**/.DS_Store": true,
-        "**/node_modules": true
+        "**/node_modules": true,
+        "**/bin": true,
+        "**/obj": true
     },
     // Defines whether an open brace is put onto a new line for functions or not
     "typescript.format.placeOpenBraceOnNewLineForFunctions": true,

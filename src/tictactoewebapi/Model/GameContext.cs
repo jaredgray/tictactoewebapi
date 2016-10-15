@@ -9,7 +9,6 @@ namespace tictactoewebapi.Model
 {
     public class GameContext : ModelEntity
     {
-        public GameContext(string userName) : base(userName) { }
         public GameContext() { }
 
         
