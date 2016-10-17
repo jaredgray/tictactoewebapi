@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
@@ -7,25 +6,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using tictactoewebapi.Model;
-using tictactoewebapi.Repositories;
 
-namespace tictactoewebapi.Controllers
+namespace tictactoewebapi.Repositories
 {
-    public class BaseController<TRepository> : Controller
-        where TRepository : IBaseRepository
+    public class BaseRepository : IBaseRepository
     {
-        public BaseController(IOptions<ConfigurationOptions> configuration, TRepository repository)
+        public BaseRepository(IOptions<ConfigurationOptions> configuration)
         {
             this.Configuration = configuration.Value;
-            Repository = repository;
         }
-        public TRepository Repository { get; set; }
         public ConfigurationOptions Configuration { get; set; }
-        protected async Task<CloudTable> GetTableAsync(string tableName)
+        public async Task<CloudTable> GetTableAsync(string tableName)
         {
             //// Retrieve the storage account from the connection string.
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(Configuration.AzureConnection);
-            
+
             // Create the table client.
             CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
             // Retrieve a reference to the table.
@@ -37,7 +32,7 @@ namespace tictactoewebapi.Controllers
 
                 return cloudTable;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw;
             }

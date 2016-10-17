@@ -8,27 +8,32 @@ using Microsoft.WindowsAzure.Storage.Table; // Namespace for Table storage types
 using Microsoft.Extensions.Configuration;
 using tictactoewebapi.Model;
 using Microsoft.Extensions.Options;
+using tictactoewebapi.Repositories;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace tictactoewebapi.Controllers
 {
     [Route("api/[controller]")]
-    public class GameController : Controller
+    public class GameController : BaseController<IGameRepository>
     {
-        public GameController(IOptions<ConfigurationOptions> configuration)
+        public GameController(IOptions<ConfigurationOptions> configuration, IGameRepository gameRepository, IUserRepository userController)
+            : base(configuration, gameRepository)
         {
-            this.Configuration = configuration.Value;
+            this.UserRepository = userController;
         }
-        public ConfigurationOptions Configuration { get; set; }
+        public IUserRepository UserRepository { get; set; }
         // GET: api/game
         /// <summary>
         /// gets nothing
         /// </summary>
-        /// <returns></returns>
+        /// <returns></returns> 
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IEnumerable<string>> Get()
         {
+            var user = await UserRepository.ByEmail("jareddavidgray@gmail.com");
+            if (null != user)
+                return new string[] { user.email };
             return new string[] { };
         }
 

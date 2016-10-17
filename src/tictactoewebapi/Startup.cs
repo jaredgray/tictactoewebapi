@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using tictactoewebapi.Model;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using tictactoewebapi.Repositories;
 
 namespace tictactoewebapi
 {
@@ -31,11 +32,8 @@ namespace tictactoewebapi
         {
             // Add framework services.
             //services.AddRouting();
-            services.AddCors();
             //Add Cors support to the service
             services.AddCors();
-            
-
             var policy = new CorsPolicy();
             policy.Headers.Add("*");
             policy.Methods.Add("*");
@@ -47,7 +45,15 @@ namespace tictactoewebapi
             services.Configure<ConfigurationOptions>(Configuration);
             services.Configure<ConfigurationOptions>(Configuration.GetSection("ConfigurationOptions"));
 
+            ConfigureDependencies(services);
+
             services.AddMvc();
+        }
+
+        static void ConfigureDependencies(IServiceCollection services)
+        {
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IGameRepository, GameRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline

@@ -10,18 +10,20 @@ using Microsoft.Extensions.Configuration;
 using tictactoewebapi.Model;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Cors;
+using tictactoewebapi.Repositories;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace tictactoewebapi.Controllers
 {
     [Route("api/[controller]")]
-    public class UserController : BaseController
+    public class UserController : BaseController<IUserRepository>
     {
-        public UserController(IOptions<ConfigurationOptions> configuration)
-            : base(configuration)
+        public UserController(IOptions<ConfigurationOptions> configuration, IUserRepository repo)
+            : base(configuration, repo)
         {
         }
+
         // GET: api/User
         /// <summary>
         /// gets nothing
@@ -53,7 +55,7 @@ namespace tictactoewebapi.Controllers
 
             return null;
         }
-        
+
         /// <summary>
         /// gets a User context by the rowkey
         /// </summary>
@@ -75,7 +77,7 @@ namespace tictactoewebapi.Controllers
             TableQuery<DynamicTableEntity> projectionQuery = new TableQuery<DynamicTableEntity>().Select(new string[] { UserKey });
 
             // Define an entity resolver to work with the entity after retrieval.
-            EntityResolver<string> resolver = (pk, rk, ts, props, etag) => rk == UserKey? rk : null;
+            EntityResolver<string> resolver = (pk, rk, ts, props, etag) => rk == UserKey ? rk : null;
 
             //foreach (string projectedEmail in cloudTable.(projectionQuery, resolver, null, null))
             //{
@@ -93,41 +95,59 @@ namespace tictactoewebapi.Controllers
         [HttpGet("{email}")]
         public async Task<User> ByEmail(string email)
         {
-            CloudTable cloudTable = await base.GetTableAsync("User");            
-            TableOperation retrieveOperation = TableOperation.Retrieve<User>("game-tictactoe", email);
-            var retrieveResult = await cloudTable.ExecuteAsync(retrieveOperation);
-            return (User)retrieveResult.Result;
+            return await this.Repository.ByEmail(email);
         }
-        
-        // POST api/values
+
+        /// <summary>
+        /// create or update a user
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        // POST api/User
         [HttpPost]
         public async Task<User> Post([FromBody] User value)
         {
-            var cloudTable = await base.GetTableAsync("User");
-
             var existing = await ByEmail(value.email);
             if (null == existing)
             {
-                value.PartitionKey = "game-user";
-                value.RowKey = value.email;
-                value.created = DateTime.Now;
-                TableOperation insertOperation = TableOperation.Insert(value);
+                value = await this.Repository.CreateUser(value);
+                return value;
             }
             else
             {
-               value = existing.UpdateWith(value);
+                value = existing.UpdateWith(value);
+                // Create the InsertOrReplace TableOperation.
+                TableOperation insertOrReplaceOperation = TableOperation.InsertOrReplace(value);
+                var cloudTable = await base.GetTableAsync("User");
+                // Execute the operation.
+                var insertOrReplaceResult = await cloudTable.ExecuteAsync(insertOrReplaceOperation);
+                return (User)insertOrReplaceResult.Result;
             }
-            // Create the InsertOrReplace TableOperation.
-            TableOperation insertOrReplaceOperation = TableOperation.InsertOrReplace(value);
-            // Execute the operation.
-            var insertOrReplaceResult = await cloudTable.ExecuteAsync(insertOrReplaceOperation);
-            return (User)insertOrReplaceResult.Result;
         }
 
+        /// <summary>
+        /// creates a user if it doesn't exist
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        // PUT api/User
+        [HttpPut]
+        public async Task<User> Put([FromBody] User value)
+        {
+            var existing = await ByEmail(value.email);
+            if (null == existing)
+            {
+                return await this.Repository.CreateUser(value);
+            }
+            else
+            {
+                return existing;
+            }
+        }
 
         // DELETE api/values/userName
-        [HttpDelete("{userName}/{UserKey}")]
-        public void Delete(string userName, string UserKey)
+        [HttpDelete("{email}")]
+        public void Delete(string email)
         {
         }
     }
