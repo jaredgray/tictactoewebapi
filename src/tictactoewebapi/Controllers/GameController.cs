@@ -31,10 +31,10 @@ namespace tictactoewebapi.Controllers
         [HttpGet]
         public async Task<IEnumerable<string>> Get()
         {
-            var user = await UserRepository.ByEmail("jareddavidgray@gmail.com");
-            if (null != user)
-                return new string[] { user.email };
-            return new string[] { };
+            //var user = await UserRepository.ByEmail("jareddavidgray@gmail.com");
+            //if (null != user)
+            //    return new string[] { user.email };
+            return new string[] { "hello world" };
         }
 
         // GET api/game/jared

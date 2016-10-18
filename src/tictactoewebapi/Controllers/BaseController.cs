@@ -12,7 +12,7 @@ using tictactoewebapi.Repositories;
 namespace tictactoewebapi.Controllers
 {
     public class BaseController<TRepository> : Controller
-        where TRepository : IBaseRepository
+        //where TRepository : IBaseRepository
     {
         public BaseController(IOptions<ConfigurationOptions> configuration, TRepository repository)
         {

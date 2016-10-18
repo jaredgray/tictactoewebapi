@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using tictactoewebapi.Model;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using tictactoewebapi.Repositories;
+using Microsoft.Extensions.Options;
 
 namespace tictactoewebapi
 {
@@ -45,25 +46,29 @@ namespace tictactoewebapi
             services.Configure<ConfigurationOptions>(Configuration);
             services.Configure<ConfigurationOptions>(Configuration.GetSection("ConfigurationOptions"));
 
-            ConfigureDependencies(services);
-
             services.AddMvc();
+            //ConfigureDependencies(services);
+
         }
 
-        static void ConfigureDependencies(IServiceCollection services)
+        void ConfigureDependencies(IServiceCollection services)
         {
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IGameRepository, GameRepository>();
+         
+            services.AddScoped<IUserRepository>(x => new UserRepository());
+            services.AddScoped<IGameRepository>(x => new GameRepository());
+            //services.AddScoped<IUserRepository, UserRepository>();
+            //services.AddScoped<IGameRepository, GameRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+        
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
             app.UseCors("AllowAllClients");
             app.UseMvc();
-           
+            
         }
     }
 }

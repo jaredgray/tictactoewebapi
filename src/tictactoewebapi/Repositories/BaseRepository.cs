@@ -9,17 +9,21 @@ using tictactoewebapi.Model;
 
 namespace tictactoewebapi.Repositories
 {
-    public class BaseRepository : IBaseRepository
+    public class BaseRepository 
     {
-        public BaseRepository(IOptions<ConfigurationOptions> configuration)
-        {
-            this.Configuration = configuration.Value;
-        }
+        //public BaseRepository(IOptions<ConfigurationOptions> configuration)
+        //{
+        //    this.Configuration = configuration.Value;
+        //}
+        public BaseRepository() { }
         public ConfigurationOptions Configuration { get; set; }
         public async Task<CloudTable> GetTableAsync(string tableName)
         {
+            var connection = Configuration?.AzureConnection;
+            if (null == connection)
+                connection = "DefaultEndpointsProtocol=https;AccountName=wstus;AccountKey=x98xoCSBs54j/pCUtxiRno3uGENRg4dqAxVSTTo18HaUmMHmwaOFxXHoA+Y+CRDbGMg7g6B7Lm1smD9Dp1dmgw==";
             //// Retrieve the storage account from the connection string.
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(Configuration.AzureConnection);
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connection);
 
             // Create the table client.
             CloudTableClient tableClient = storageAccount.CreateCloudTableClient();

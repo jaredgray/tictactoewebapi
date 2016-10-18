@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace tictactoewebapi.Repositories
 {
-    public interface IGameRepository : IBaseRepository
+    public interface IGameRepository 
     {
     }
 }
