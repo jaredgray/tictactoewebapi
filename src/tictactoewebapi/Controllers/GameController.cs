@@ -21,6 +21,7 @@ namespace tictactoewebapi.Controllers
             : base(configuration, gameRepository)
         {
             this.UserRepository = userController;
+            
         }
         public IUserRepository UserRepository { get; set; }
         // GET: api/game
@@ -31,9 +32,13 @@ namespace tictactoewebapi.Controllers
         [HttpGet]
         public async Task<IEnumerable<string>> Get()
         {
-            //var user = await UserRepository.ByEmail("jareddavidgray@gmail.com");
-            //if (null != user)
-            //    return new string[] { user.email };
+            try
+            {
+                var user = await UserRepository.ByEmail("jareddavidgray@gmail.com");
+                if (null != user)
+                    return new string[] { user.name, user.email, user.created.Value.ToLocalTime().ToString() };
+            }
+            catch { }
             return new string[] { "hello world" };
         }
 
@@ -57,7 +62,7 @@ namespace tictactoewebapi.Controllers
 
             return null;
         }
-        
+
         /// <summary>
         /// gets a game context by the rowkey
         /// </summary>
@@ -95,7 +100,7 @@ namespace tictactoewebapi.Controllers
         /// </summary>
         /// <param name="userName">the user to create the game for</param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet("{userName}")]
         public GameContext New(string userName)
         {
             return new GameContext()

@@ -14,10 +14,10 @@ namespace tictactoewebapi.Controllers
     public class BaseController<TRepository> : Controller
         //where TRepository : IBaseRepository
     {
-        public BaseController(IOptions<ConfigurationOptions> configuration, TRepository repository)
+        public BaseController(IOptions<ConfigurationOptions> options, TRepository repository)
         {
-            this.Configuration = configuration.Value;
             Repository = repository;
+            Configuration = options.Value;
         }
         public TRepository Repository { get; set; }
         public ConfigurationOptions Configuration { get; set; }

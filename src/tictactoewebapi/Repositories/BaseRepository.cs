@@ -11,10 +11,10 @@ namespace tictactoewebapi.Repositories
 {
     public class BaseRepository 
     {
-        //public BaseRepository(IOptions<ConfigurationOptions> configuration)
-        //{
-        //    this.Configuration = configuration.Value;
-        //}
+        public BaseRepository(IOptions<ConfigurationOptions> configuration)
+        {
+            this.Configuration = configuration.Value;
+        }
         public BaseRepository() { }
         public ConfigurationOptions Configuration { get; set; }
         public async Task<CloudTable> GetTableAsync(string tableName)

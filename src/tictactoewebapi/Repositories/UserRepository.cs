@@ -8,9 +8,9 @@ namespace tictactoewebapi.Repositories
 {
     public class UserRepository : BaseRepository, IUserRepository
     {
-        //public UserRepository(IOptions<ConfigurationOptions> configuration) : base(configuration)
-        //{
-        //}
+        public UserRepository(IOptions<ConfigurationOptions> configuration) : base(configuration)
+        {
+        }
         public UserRepository() { }
         
         public async Task<User> CreateUser(User value)

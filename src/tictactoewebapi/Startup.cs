@@ -47,17 +47,18 @@ namespace tictactoewebapi
             services.Configure<ConfigurationOptions>(Configuration.GetSection("ConfigurationOptions"));
 
             services.AddMvc();
-            //ConfigureDependencies(services);
+            ConfigureDependencies(services);
 
         }
 
         void ConfigureDependencies(IServiceCollection services)
         {
-         
-            services.AddScoped<IUserRepository>(x => new UserRepository());
-            services.AddScoped<IGameRepository>(x => new GameRepository());
-            //services.AddScoped<IUserRepository, UserRepository>();
-            //services.AddScoped<IGameRepository, GameRepository>();
+            //services.AddScoped<ConfigurationOptions>((svcs) => new ConfigurationOptions());
+            //services.AddScoped<IUserRepository>(x => new UserRepository());
+            //services.AddScoped<IGameRepository>(x => new GameRepository());
+            services.AddScoped<ConfigurationOptions, ConfigurationOptions>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IGameRepository, GameRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline

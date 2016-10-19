@@ -22,6 +22,8 @@ namespace tictactoewebapi.Controllers
         public UserController(IOptions<ConfigurationOptions> configuration, IUserRepository repo)
             : base(configuration, repo)
         {
+            this.Configuration = configuration.Value;
+            Repository = repo;
         }
 
         // GET: api/User

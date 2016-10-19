@@ -172,6 +172,8 @@
 -resource:"C:\SC\PDX Web\tictactoewebapi\src\tictactoewebapi\obj\Debug\netcoreapp1.0\tictactoewebapidotnet-compile.deps.json",tictactoewebapi.deps.json
 "C:\SC\PDX Web\tictactoewebapi\src\tictactoewebapi\Program.cs"
 "C:\SC\PDX Web\tictactoewebapi\src\tictactoewebapi\Startup.cs"
+"C:\SC\PDX Web\tictactoewebapi\src\tictactoewebapi\Containers\ContainerResult.cs"
+"C:\SC\PDX Web\tictactoewebapi\src\tictactoewebapi\Containers\TimeoutContainer.cs"
 "C:\SC\PDX Web\tictactoewebapi\src\tictactoewebapi\Controllers\BaseController.cs"
 "C:\SC\PDX Web\tictactoewebapi\src\tictactoewebapi\Controllers\GameController.cs"
 "C:\SC\PDX Web\tictactoewebapi\src\tictactoewebapi\Controllers\UserController.cs"

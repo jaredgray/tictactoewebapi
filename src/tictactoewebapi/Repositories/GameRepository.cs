@@ -9,9 +9,9 @@ namespace tictactoewebapi.Repositories
 {
     public class GameRepository : BaseRepository, IGameRepository
     {
-        //public GameRepository(IOptions<ConfigurationOptions> configuration) : base(configuration)
-        //{
-        //}
+        public GameRepository(IOptions<ConfigurationOptions> configuration) : base(configuration)
+        {
+        }
         public GameRepository() { }
     }
 }
