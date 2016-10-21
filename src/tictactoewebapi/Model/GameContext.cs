@@ -10,9 +10,7 @@ namespace tictactoewebapi.Model
     public class GameContext : ModelEntity
     {
         public GameContext() { }
-
         
-        public string me { get; set; }
         public string opponent { get; set; }
         public string initiator { get; set; }
         public string turn { get; set; }

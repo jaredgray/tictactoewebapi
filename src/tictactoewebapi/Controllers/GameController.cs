@@ -51,15 +51,7 @@ namespace tictactoewebapi.Controllers
         [HttpGet("{userName}")]
         public async Task<IEnumerable<GameContext>> GetAll(string userName)
         {
-            //// Retrieve the storage account from the connection string.
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(Configuration.AzureConnection);
-            // Create the table client.
-            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
-            // Retrieve a reference to the table.
-            CloudTable cloudTable = tableClient.GetTableReference("gamecontext");
-            // Create the table if it doesn't exist.
-            var result = await cloudTable.CreateIfNotExistsAsync();
-
+            
             return null;
         }
 
